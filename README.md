@@ -67,4 +67,5 @@ The tree checks `GameState` from the game controller each tick and activates the
 
 - `py_trees`
 - `numpy`
-- `TeamControl` (world model, networking, robot movement)
+- `TeamControl` (world model, networking, robot movement) ** THIS IS ALREADY IN THE MAIN PROJECT **
+
