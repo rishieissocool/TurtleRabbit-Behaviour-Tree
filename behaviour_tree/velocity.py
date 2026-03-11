@@ -1,6 +1,5 @@
 from enum import Enum, auto
-
-import numpy as np
+import math
 
 from TeamControl.world.transform_cords import world2robot
 
@@ -27,7 +26,7 @@ class Mode(Enum):
 
 def angle_between(robot_pos, target_pos):
     direction_2d = world2robot(robot_pos, target_pos)
-    angle = np.arctan2(direction_2d[1], direction_2d[0])
+    angle = math.atan2(direction_2d[1], direction_2d[0])
     return angle
 
 
@@ -47,28 +46,24 @@ def select_linear_speed(relative_target, mode: Mode):
             if relative_target <= LINEAR["stop"][0]:
                 speed = LINEAR["stop"][1]
             elif relative_target <= LINEAR["slow"][0]:
-                print("Go Slow")
                 speed = LINEAR["slow"][1]
             else:
-                print("Go Fast")
                 speed = LINEAR["fast"][1]
 
         case Mode.Normal:
             if relative_target < LINEAR["normal"][0]:
                 speed = 0.0
             else:
-                print("Go Normal")
                 speed = LINEAR["normal"][1]
 
         case Mode.Fast:
-            print("Go Fast")
             speed = LINEAR["fast"][1]
     return speed
 
 
 def go_to_target(robot_pos, target_pos, mode=Mode.Percision) -> tuple[float, float]:
     relative_target_arr = world2robot(robot_pos, target_pos)
-    relative_distance = np.linalg.norm(relative_target_arr)
+    relative_distance = math.hypot(relative_target_arr[0], relative_target_arr[1])
     speed = select_linear_speed(relative_distance, mode)
     return calculate_linear_velocity(relative_target_arr, speed)
 
@@ -95,13 +90,10 @@ def select_angular_speed(relative_angle, mode: Mode):
     match mode:
         case Mode.Percision:
             if relative_angle <= ANGULAR["stop"][0]:
-                print("facing target")
                 speed = ANGULAR["stop"][1]
             elif relative_angle <= ANGULAR["slow"][0]:
-                print("slow turn")
                 speed = ANGULAR["slow"][1]
             else:
-                print("fast turn")
                 speed = ANGULAR["fast"][1]
 
         case Mode.Normal:
@@ -128,7 +120,7 @@ def calculate_angular_velocity(relative_angle, speed, kp_gain=1.0) -> float:
 
 
 if __name__ == "__main__":
-    robot_pos = np.array([0, 0, 0.1])
-    target_pos = np.array([10, 1])
+    robot_pos = (0, 0, 0.1)
+    target_pos = (10, 1)
     print(go_to_target(robot_pos, target_pos, Mode.Normal))
     print(turn_to_target(robot_pos, target_pos, Mode.Normal))

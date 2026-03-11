@@ -230,7 +230,6 @@ class StopTree(py_trees.composites.Sequence):
         if isStoppedStatus == py_trees.common.Status.SUCCESS:
             return py_trees.common.Status.SUCCESS
         elif isStoppedStatus == py_trees.common.Status.INVALID:
-            print("[StopTree] isStoppedStatus for isStopped = INVALID")
             return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.FAILURE
@@ -378,7 +377,7 @@ class GetState(py_trees.behaviour.Behaviour):
         # for now, we shall comment this out -- testing
         self.state = self.wm.get_game_state()
 
-        print(f"[GetState] Initialized with state: {self.state}")
+        # print(f"[GetState] Initialized with state: {self.state}")
         # print("Debug: GetState initialized")
 
     def setup(self, **kwargs):  
@@ -389,29 +388,14 @@ class GetState(py_trees.behaviour.Behaviour):
     # note: instead of passing state_for_testing, get the actual state from the game controller
     # default is RUNNING for test operation, but should be changed for real use
     def update(self) -> py_trees.common.Status:
-        self.bb.game_state = self.wm.get_game_state()
-        old_state = self.bb.game_state
         new_state = self.wm.get_game_state()
-        
-        # if old_state == new_state:
-        #     print("[GetState] Game state unchanged:", new_state)
-        #     return py_trees.common.Status.SUCCESS
-       
-        if self.bb.game_state is None:
-            print("NO STATE")
+        self.bb.game_state = new_state
+
+        if new_state is None:
             return py_trees.common.Status.FAILURE
-        elif new_state == GameState.STOPPED:
-            print("[GetState] Game state is STOPPED")
-            return py_trees.common.Status.SUCCESS
-        elif new_state == GameState.RUNNING:
-            print("[GetState] Game state is RUNNING")
-            return py_trees.common.Status.SUCCESS
-        elif new_state == GameState.HALTED:
-            print("[GetState] Game state is HALTED")
+        elif new_state in (GameState.STOPPED, GameState.RUNNING, GameState.HALTED):
             return py_trees.common.Status.SUCCESS
         else:
-            # print("Unknown Game State:", self.bb.game_state, 
-            #       "\nHint: Try using 'RUNNING', 'STOPPED' or 'HALTED'")
             return py_trees.common.Status.FAILURE
 
     # def print_state(self):

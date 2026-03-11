@@ -35,13 +35,16 @@ def run_bt_process(is_running:Event, wm:WorldModel, dispatcher_q:Queue)->None:
     #     bt.tick_tock(1, stop_on_terminal_state=True)
     #     logger.debug(py_trees.display.unicode_tree(root, show_status=True))
 
+    tick_count = 0
     while is_running.is_set():
         bt.tick()
-        
-        tree_snapshot = py_trees.display.unicode_tree(
-            root,
-            show_status=True,
-            visited=True
-        )
-        
-        logger.debug("\n" + tree_snapshot)
+        tick_count += 1
+
+        # Only generate tree snapshot every 100 ticks to avoid expensive string formatting
+        if tick_count % 100 == 0:
+            tree_snapshot = py_trees.display.unicode_tree(
+                root,
+                show_status=True,
+                visited=True
+            )
+            logger.debug("\n" + tree_snapshot)

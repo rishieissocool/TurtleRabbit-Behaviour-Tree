@@ -1,4 +1,4 @@
-import numpy as np
+import math
 import py_trees
 from py_trees.common import Status
 
@@ -40,7 +40,7 @@ class MoveawayFromBall(py_trees.behaviour.Behaviour):
         if target_pos is None:
             return Status.INVALID
 
-        if np.allclose(target_pos, robot_pos[:2]):
+        if abs(target_pos[0] - robot_pos[0]) < 1e-8 and abs(target_pos[1] - robot_pos[1]) < 1e-8:
             cmd = {"vx": 0.0, "vy": 0.0}
             self.bb.cmd_mgr.update_command(**cmd)
             is_sent = self.bb.cmd_mgr.pack_and_send()

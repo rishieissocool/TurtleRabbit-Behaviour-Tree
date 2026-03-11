@@ -32,7 +32,6 @@ class CommandManager:
         self.w = kwargs.get("w", self.w)
         self.dribble = kwargs.get("dribble", self.dribble)
         self.kick = kwargs.get("kick", self.kick)
-        print("updated", kwargs)
 
     def pack_and_send(self):
         command = self._to_command()
@@ -40,9 +39,6 @@ class CommandManager:
             self.output_queue.put([command, self.run_time])
             # print("command sent", command)
             return True
-        else:
-            print("output queue is full")
-
         return False
 
 

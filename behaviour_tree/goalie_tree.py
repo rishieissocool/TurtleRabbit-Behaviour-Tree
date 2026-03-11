@@ -5,7 +5,6 @@ from TeamControl.network.robot_command import RobotCommand
 from TeamControl.robot.Movement import RobotMovement
 
 import py_trees
-import numpy as np
 
 
 class GoalieRunningSeq(py_trees.composites.Sequence):
@@ -120,13 +119,10 @@ class GetBallHistory(py_trees.behaviour.Behaviour):
     def get_ball_hist(self,n:int):
         self.ball_hist = list()
         frames = self.wm.get_last_n_frames(n)
-        l = len(frames)
-        for i in range(l):
+        for i in range(len(frames)):
             ball_data = frames[i].ball
-            if ball_data != None:
-                # print(ball_data)
+            if ball_data is not None:
                 self.ball_hist.append([ball_data.x,ball_data.y])
-        # print(len(self.ball_hist))
         return self.ball_hist
         
 
@@ -229,7 +225,6 @@ class RobotGoToTarget(py_trees.behaviour.Behaviour):
         
         if self.turn is True:
             facing_pos = self.bb.facing_pos if self.bb.facing_pos is not None else self.bb.target_pos
-            print(facing_pos)
         vx,vy,w = RobotMovement.velocity_to_target(robot_pos=robot_pos,
                                                    target=target_pos,
                                                    turning_target=facing_pos,

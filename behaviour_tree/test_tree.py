@@ -7,7 +7,6 @@ from .common_trees import GetWorldPositionUpdate,GetRobotIDPosition
 
 
 import py_trees
-import numpy as np
 import math
 import time
 
@@ -148,12 +147,12 @@ class AlreadyLookingAtTarget(py_trees.behaviour.Behaviour):
         self.bb.register_key(key="w",access=py_trees.common.Access.WRITE)
     
     def wrap_to_pi(self,a) -> float:
-        return (a + np.pi) % (2*np.pi) - np.pi
-    
+        return (a + math.pi) % (2*math.pi) - math.pi
+
     def update(self) -> py_trees.common.Status:
         # check if robot is at ball
         trans_pos = self.bb.new_dir
-        new_orientation = self.wrap_to_pi(np.arctan2(trans_pos[1],trans_pos[0]))
+        new_orientation = self.wrap_to_pi(math.atan2(trans_pos[1],trans_pos[0]))
         
         self.bb.d_theta = new_orientation  
         # print(self.bb.d_theta,new_orientation,self.bb.robot_pos[2])
@@ -256,7 +255,7 @@ class AlreadyAtTarget(py_trees.behaviour.Behaviour):
     def update(self) -> py_trees.common.Status:
         # check if robot is at ball
         trans_pos = self.bb.trans_pos
-        distance = math.sqrt(trans_pos[0]**2 + trans_pos[1]**2)
+        distance = math.hypot(trans_pos[0], trans_pos[1])
         self.bb.target_dist = distance
         
         if distance <= self.threshold: 
@@ -307,10 +306,6 @@ class CalculateLinearVelocity(py_trees.behaviour.Behaviour):
             self.bb.vx =0 
             self.bb.vy =0 
         return py_trees.common.Status.SUCCESS
-        
-        # otherwise this is failure
-        print("[CalculateRobotToBall] threshold error")
-        return py_trees.common.Status.FAILURE
 
 class DoDribbleKick(py_trees.behaviour.Behaviour):
     def __init__(self, speed:float,dribble_threshold:float,kick_threshold:float,kick_angle:float):
@@ -339,7 +334,7 @@ class DoDribbleKick(py_trees.behaviour.Behaviour):
         kick = 0
         distance = self.bb.target_dist 
         angle_diff = self.bb.d_theta
-        print("distance",distance, " angle ",angle_diff)
+        self.logger.debug(f"distance {distance} angle {angle_diff}")
                 
         if distance <= self.dribble_threshold and abs(angle_diff) <= self.kick_angle:
             self.logger.info("DRIBBLING")
@@ -352,7 +347,7 @@ class DoDribbleKick(py_trees.behaviour.Behaviour):
                 self.start_time = time.time()
                 self.has_ball = True
 
-                print(f"time diff {self.start_time - time.time()}")
+                self.logger.debug(f"time diff {self.start_time - time.time()}")
             if self.start_time + 0.5 <= time.time():
                 self.logger.info("KICK")
                 self.start_time = 0
@@ -470,7 +465,7 @@ class SendRobotCommand(py_trees.behaviour.Behaviour):
             return py_trees.common.Status.SUCCESS
         
         else:
-            print("[SendRobotCommand] Dispatcher queue is full, cannot send command")
+            self.logger.warning("[SendRobotCommand] Dispatcher queue is full, cannot send command")
             return py_trees.common.Status.FAILURE
         # this is always success until we put more stuff to check here.
         
